@@ -1,0 +1,64 @@
+[{
+    "id": 1,
+    "summary": "1st Round",
+    "desc": "1st Round",
+    "start": "2025-03-29T18:00:00+05:30",
+    "end": "2025-03-29T18:30:00+05:30",
+    "link": "http://www.hhh.com",
+    "user_det": {
+      "candidate": {
+        "candidate_firstName": "mohan",
+        "candidate_lastName": "raj"
+      },
+      "handled_by": {
+        "firstName": "Vinodhini",
+        "lastName": "HR"
+      }
+    },
+    "job_id": {
+      "jobRequest_Title": "django developer"
+    }
+  },
+  {
+    "id": 2,
+    "summary": "Test",
+    "desc": "Test",
+    "start": "2025-03-23T18:00:00+05:30",
+    "end": "2025-03-23T18:30:00+05:30",
+    "link": "http://www.hhh.com",
+    "user_det": {
+      "candidate": {
+        "candidate_firstName": "mohan",
+        "candidate_lastName": "raj"
+      },
+      "handled_by": {
+        "firstName": "Vinodhini",
+        "lastName": "HR"
+      }
+    },
+    "job_id": {
+      "jobRequest_Title": "django developer"
+    }
+  },
+  {
+    "id": 3,
+    "summary": "2nd Round",
+    "desc": "2nd Round",
+    "start": "2025-03-17T18:00:00+05:30",
+    "end": "2025-03-17T18:30:00+05:30",
+    "link": "http://www.hhh.com",
+    "user_det": {
+      "candidate": {
+        "candidate_firstName": "mohan",
+        "candidate_lastName": "raj"
+      },
+      "handled_by": {
+        "firstName": "Vinodhini",
+        "lastName": "HR"
+      }
+    },
+    "job_id": {
+      "jobRequest_Title": "django developer"
+    }
+  }
+]
