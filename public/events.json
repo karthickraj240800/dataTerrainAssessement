@@ -23,8 +23,8 @@
     "id": 2,
     "summary": "Test",
     "desc": "Test",
-    "start": "2025-03-17T18:00:00+05:30",
-    "end": "2025-03-17T18:30:00+05:30",
+    "start": "2025-03-17T13:00:00+05:30",
+    "end": "2025-03-17T13:30:00+05:30",
     "link": "https://meet.google.com/iug-jkjf-jhk",
     "user_det": {
       "candidate": {
@@ -44,8 +44,8 @@
     "id": 3,
     "summary": "2nd Round",
     "desc": "2nd Round",
-    "start": "2025-03-17T18:00:00+05:30",
-    "end": "2025-03-17T18:30:00+05:30",
+    "start": "2025-03-17T10:00:00+05:30",
+    "end": "2025-03-17T10:30:00+05:30",
     "link": "https://meet.google.com/iug-jkjf-jhk",
     "user_det": {
       "candidate": {
