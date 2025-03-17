@@ -1,0 +1,46 @@
+/* === Calendar Event Styles === */
+.event-container {
+    position: relative;
+    background-color: #2563eb; /* Blue-600 */
+    color: white;
+    padding: 12px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-left: 4px solid #1e40af; /* Blue-900 */
+    font-family: Arial, sans-serif;
+  }
+  
+  .event-title {
+    font-weight: bold;
+    font-size: 14px;
+  }
+  
+  .event-details {
+    font-size: 12px;
+    margin-top: 4px;
+  }
+  
+  .event-time {
+    font-size: 10px;
+    margin-top: 2px;
+  }
+  
+  .event-badge {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background-color: #facc15; /* Yellow-400 */
+    color: black;
+    font-size: 10px;
+    padding: 4px 6px;
+    border-radius: 12px;
+  }
+  
+  .event-link {
+    color: #facc15; /* Yellow */
+    font-size: 12px;
+    text-decoration: underline;
+    display: block;
+    margin-top: 6px;
+  }
+  
