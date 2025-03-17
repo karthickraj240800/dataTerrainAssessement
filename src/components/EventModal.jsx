@@ -1,4 +1,6 @@
 const EventModal = ({ event, onClose }) => {
+  if (!event) return null;
+
   const handleJoin = () => {
     window.open(event.link, '_blank');
   };
@@ -10,7 +12,7 @@ const EventModal = ({ event, onClose }) => {
           <h2 className="text-xl font-bold">{event.summary}</h2>
           <button
             onClick={onClose}
-            className="text-red-500 hover:text-gray-700 z-40  text-2xl font-bold"
+            className="text-red-500 hover:text-gray-700 text-2xl font-bold"
           >
             ×
           </button>

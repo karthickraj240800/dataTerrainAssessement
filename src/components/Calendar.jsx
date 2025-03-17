@@ -8,9 +8,7 @@ import enUS from 'date-fns/locale/en-US';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import EventModal from './EventModal';
 
-const locales = {
-  'en-US': enUS,
-};
+const locales = { 'en-US': enUS };
 
 const localizer = dateFnsLocalizer({
   format,
@@ -21,7 +19,6 @@ const localizer = dateFnsLocalizer({
 });
 
 const Calendar = ({ events }) => {
-  console.log(events);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [showModal, setShowModal] = useState(false);
 
@@ -30,68 +27,59 @@ const Calendar = ({ events }) => {
     setShowModal(true);
   };
 
-  const eventStyleGetter = (event) => {
-    return {
-      style: {
-        backgroundColor: "#2563eb",
-        color: "white",
-        padding: "8px",
-        borderRadius: "5px",
-        whiteSpace: "normal", 
-        wordWrap: "break-word",
-        minHeight: "100px", 
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
-       
-      },
-    };
-  };
-  const CustomEvent = ({ event }) => {
-    const startTime = new Date(event.start).toLocaleTimeString("en-US", {
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: true,
-    });
   
-    const endTime = new Date(event.end).toLocaleTimeString("en-US", {
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: true,
-    });
+
+  // Group events by date
+  const groupedEvents = events.reduce((acc, event) => {
+    const eventDate = format(new Date(event.start), 'yyyy-MM-dd');
+    if (!acc[eventDate]) acc[eventDate] = [];
+    acc[eventDate].push(event);
+    return acc;
+  }, {});
+
+  // Custom Event Card (Show max 3 events in Month View)
+  const CustomEvent = ({ event }) => {
+    const eventDate = format(new Date(event.start), 'yyyy-MM-dd');
+    const eventsForDate = groupedEvents[eventDate];
+
     return (
-      <div className="bg-blue-600 text-white p-2 rounded-lg shadow-lg z-10">
-        <p className="font-bold">{event.summary}</p>
-        <p className="text-sm">Job: {event.job_id.jobRequest_Title}</p>
-        <p>{startTime} -  {endTime}</p>
+      <div className="flex flex-col space-y-2 h-full z-10 gap-x-2 width-auto">
+        {eventsForDate.slice(0, 3).map((e, index) => (
+          <div
+            key={index}
+            className= "bg-blue-600 text-white p rounded-sm shadow-md cursor-pointer flex flex-row "
+            onClick={() => handleSelectEvent(e)}
+          >
+            <p className="text-[13px]">{e.summary}-{e.job_id.jobRequest_Title} </p>
+           
+          </div>
+        ))}
+        {eventsForDate.length > 3 && (
+          <p className="text-gray-500 text-xs">+{eventsForDate.length - 3} more</p>
+        )}
       </div>
     );
   };
 
-
-        return (
-        <div className="h-screen p-4">
-          <BigCalendar
-            localizer={localizer}
-            events={events}
-            startAccessor="start"
-            endAccessor="end"
-            style={{ height: "100vh", width: "90vw" }}
-            onSelectEvent={handleSelectEvent}
-            eventPropGetter={eventStyleGetter}
-            views={['month', 'week', 'day']}
-            components={{
-              event: CustomEvent, 
-            }}
-          />
-          {showModal && (
-            <EventModal
-              event={selectedEvent}
-              onClose={() => setShowModal(false)}
-            />
-          )}
-        </div>
-        );
+  return (
+    <div className="h-screen p-4">
+      <BigCalendar
+        localizer={localizer}
+        events={events}
+        startAccessor="start"
+        endAccessor="end"
+        style={{ height: "100vh", width: "90vw" }}
+        onSelectEvent={handleSelectEvent}
+        views={['month', 'week', 'day']}
+        components={{
+          event: CustomEvent, 
+        }}
+      />
+      {showModal && (
+        <EventModal event={selectedEvent} onClose={() => setShowModal(false)} />
+      )}
+    </div>
+  );
 };
 
-        export default Calendar;
+export default Calendar;
