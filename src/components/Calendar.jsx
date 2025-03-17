@@ -1,96 +1,132 @@
-import { useState } from "react";
-import { Calendar as BigCalendar, dateFnsLocalizer } from "react-big-calendar";
-import format from "date-fns/format";
-import parse from "date-fns/parse";
-import startOfWeek from "date-fns/startOfWeek";
-import getDay from "date-fns/getDay";
-import enUS from "date-fns/locale/en-US";
-import "react-big-calendar/lib/css/react-big-calendar.css";
-import EventModal from "./EventModal";
+import React, { useEffect, useState } from "react";
+import FullCalendar from "@fullcalendar/react";
+import dayGridPlugin from "@fullcalendar/daygrid";
+import timeGridPlugin from "@fullcalendar/timegrid";
+import interactionPlugin from "@fullcalendar/interaction";
+import timeGridDay from "@fullcalendar/timegrid";
+import MeetingPopUp from "./MeetingPopUp";
+import "./calendar.css";
 
-const locales = { "en-US": enUS };
-
-const localizer = dateFnsLocalizer({
-  format,
-  parse,
-  startOfWeek,
-  getDay,
-  locales,
-});
-
-const Calendar = ({ events }) => {
+const Calendar = () => {
+  const [events, setEvents] = useState([]);
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState(null);
-  const [showModal, setShowModal] = useState(false);
-  const [currentView, setCurrentView] = useState("month"); // Track view type
 
-  const handleSelectEvent = (event) => {
-    setSelectedEvent(event);
-    setShowModal(true);
-  };
+  // Fetch events from JSON
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        const response = await fetch("/calendarfromtoenddate.json");
+        const data = await response.json();
 
-  // Group events by date for Month View only
-  const groupedEvents = events.reduce((acc, event) => {
-    const eventDate = format(new Date(event.start), "yyyy-MM-dd");
-    if (!acc[eventDate]) acc[eventDate] = [];
-    acc[eventDate].push(event);
-    return acc;
-  }, {});
+        let formattedEvents = data.map((event) => ({
+          id: event.id,
+          title: event.summary,
+          start: event.start,
+          end: event.end,
+          extendedProps: {
+            interviewer: event.user_det?.handled_by?.firstName || "Unknown",
+            email: event.user_det?.handled_by?.userEmail || "N/A",
+            candidate: `${event.user_det?.candidate?.candidate_firstName || ""} ${event.user_det?.candidate?.candidate_lastName || ""}`,
+            jobTitle: event.job_id?.jobRequest_Title || "N/A",
+            jobRole: event.job_id?.jobRequest_Role || "N/A",
+            jobSkills: event.job_id?.jobRequest_KeySkills || "N/A",
+            link: event.link || "#",
+            Header: event.summary,
+            start: event.start,
+            end: event.end,
+          },
+        }));
 
-  // Custom Event Card (Month View: Show max 3 events per day)
-  const CustomEvent = ({ event }) => {
-    const eventDate = format(new Date(event.start), "yyyy-MM-dd");
+        setEvents(formattedEvents);
+      } catch (error) {
+        console.error("Error fetching events:", error);
+      }
+    };
 
-    if (currentView === "month") {
-      const eventsForDate = groupedEvents[eventDate] || [];
-      return (
-        <div className="flex flex-col space-y-2 gap-x-2">
-          {eventsForDate.slice(0, 3).map((e, index) => (
-            <div
-              key={index}
-              className="bg-blue-600 text-white  rounded-sm shadow-md cursor-pointer   flex flex-row"
-              onClick={() => handleSelectEvent(e)}
-            >
-              <p className="text-[13px]">{e.summary} - {e.job_id.jobRequest_Title}</p>
-            </div>
-          ))}
-          {eventsForDate.length > 3 && (
-            <p className="text-gray-500 text-xs">+{eventsForDate.length - 3} more</p>
-          )}
-        </div>
-      );
+    fetchEvents();
+  }, []);
+
+  // Handle Event Click
+  const handleEventClick = (eventData) => {
+    if (!eventData || !eventData.extendedProps) {
+      console.error("No extendedProps found for event:", eventData);
+      return;
     }
 
-    // ✅ Week & Day View: Show event separately with correct title
+    setSelectedEvent(eventData.extendedProps);
+    setIsPopupOpen(true);
+  };
+
+  // Render Events with Responsive Design
+  const renderEventContent = (eventInfo) => {
+
     return (
       <div
-        className=" text-white rounded-lg shadow-lg cursor-pointer gap-x-2  h-[20px]"
-        onClick={() => handleSelectEvent(event)}
+        className="event-card cursor-pointer bg-white border-l-4 border-blue-600 shadow-md p-3 rounded-lg hover:shadow-lg transition-all"
+        onClick={() => handleEventClick(eventInfo.event)}
+        style={{ minHeight: "60px", whiteSpace: "normal" }} // Fix height issue
       >
-        <p className="text-[13px] pt-[2px] pb-[10px]">{event.summary} - {event.job_id.jobRequest_Title}</p>
-        
+        <h3 className="font-bold text-black text-xs sm:text-base">
+          {eventInfo.event.title}
+        </h3>
+        <p className="text-xs sm:text-sm text-gray-700">
+          {eventInfo.event.extendedProps?.jobTitle}
+        </p>
+        <p className="text-xs sm:text-sm text-gray-700">
+          Interviewer: {eventInfo.event.extendedProps?.interviewer}
+        </p>
+        <p className="text-xs sm:text-sm text-gray-700">
+          {new Date(eventInfo.event.start).toLocaleTimeString("en-US", {
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: true,
+          })}{" "}
+          -{" "}
+          {new Date(eventInfo.event.end).toLocaleTimeString("en-US", {
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: true,
+          })}
+        </p>
       </div>
     );
   };
 
   return (
-    <div className="h-screen p-4">
-      <BigCalendar
-        localizer={localizer}
-        events={events}
-        startAccessor="start"
-        endAccessor="end"
-        style={{ height: "100vh", width: "90vw" }}
-        onSelectEvent={handleSelectEvent}
-        views={["month", "week", "day"]}
-        onView={(view) => setCurrentView(view)} // Track view changes
-        components={{
-          event: CustomEvent, 
-        }}
-      />
-      {showModal && (
-        <EventModal event={selectedEvent} onClose={() => setShowModal(false)} />
+    <>
+      <div className="border border-gray-300 shadow-md p-4 rounded-lg bg-gray-100">
+        <FullCalendar
+          plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin, timeGridDay]}
+          initialView="dayGridMonth"
+          events={events}
+          eventContent={renderEventContent}
+          headerToolbar={{
+            left: "prev,next today",
+            center: "title",
+            right: "dayGridMonth,timeGridWeek,timeGridDay",
+          }}
+          height="auto"
+          views={{
+            timeGridWeek: {
+              slotEventOverlap: false, // Prevent overlapping events
+              eventMaxStack: 2, // Limit max stacked events per row
+            },
+          }}
+        />
+      </div>
+
+      {/* Popup for Event Details */}
+      {isPopupOpen && selectedEvent && (
+        <MeetingPopUp
+          event={selectedEvent}
+          onClose={() => {
+            setIsPopupOpen(false);
+            setSelectedEvent(null);
+          }}
+        />
       )}
-    </div>
+    </>
   );
 };
 
